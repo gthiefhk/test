@@ -2,213 +2,83 @@
 <html lang="zh-HK">
 <head>
 <meta charset="UTF-8">
-<title>隨機點餐遊戲（已修正版）</title>
+<title>湯麵區練習</title>
 <style>
-    body {
-        font-family: "Microsoft JhengHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        background: #fff5e6;
-        margin: 0;
-        padding: 20px;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 40px;
-        color: #5d4037;
-    }
-    #menu {
-        width: 380px;
-        min-height: 640px;
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    }
-    .food-btn {
-        width: 100%;
-        padding: 18px 20px;
-        margin: 8px 0;
-        font-size: 20px;
-        text-align: left;
-        background: #fffae6;
-        border: 2px solid #ffcc80;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.2s;
-        user-select: none;
-    }
-    .food-btn:hover { background: #fff0b3; }
-    .food-btn.selected {
-        background: #ff8a65;
-        color: white;
-        border-color: #ff5722;
-    }
-    #right-panel {
-        width: 380px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    #main-complete {
-        padding: 20px 60px;
-        font-size: 28px;
-        background: #ff5722;
-        color: white;
-        border: none;
-        border-radius: 16px;
-        cursor: pointer;
-        box-shadow: 0 8px 20px rgba(255,87,34,0.4);
-        margin-bottom: 20px;
-    }
-    #main-complete:hover { background: #f44336; }
-
-    #completed-area {
-        width: 100%;
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        min-height: 400px;
-    }
-    #completed-title {
-        font-size: 24px;
-        font-weight: bold;
-        color: #ff5722;
-        text-align: center;
-        margin-bottom: 15px;
-    }
-    .completed-item {
-        padding: 14px 18px;
-        margin: 8px 0;
-        background: #ffccbc;
-        border-left: 6px solid #ff5722;
-        border-radius: 8px;
-        font-size: 19px;
-    }
-    #big-finish {
-        font-size: 48px;
-        font-weight: bold;
-        color: #ff5722;
-        text-align: center;
-        margin-top: 180px;
-    }
-    #restart {
-        padding: 18px 50px;
-        font-size: 24px;
-        background: #ff5722;
-        color: white;
-        border: none;
-        border-radius: 16px;
-        cursor: pointer;
-        margin-top: 30px;
-    }
-    #restart:hover { background: #f44336; }
+    body{font-family: system-ui; background:#fff5e6; margin:0; height:100dvh; display:grid; place-items:center; gap:30px; padding:15px; box-sizing:border-box}
+    @media (orientation: portrait){body{grid-template-columns:1fr; gap:20px}}
+    @media (orientation: landscape){body{grid-template-columns:1fr 1fr}}
+    #menu, #completed-area{background:#fff; border-radius:20px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,.15); min-height:500px; overflow-y:auto}
+    .btn{padding:18px; margin:8px 0; width:100%; border-radius:12px; font-size:20px; text-align:left; cursor:pointer; transition:.2s}
+    .food-btn{background:#fffae6; border:2px solid #ffcc80}
+    .food-btn:hover{background:#fff0b3}
+    .food-btn.sel{background:#ff6d3b; color:#fff; border-color:#f44336}
+    #complete-btn, #restart-btn{padding:18px 50px; font-size:26px; background:#ff5722; color:#fff; border:none; border-radius:16px; cursor:pointer; box-shadow:0 8px 20px rgba(255,87,34,.4)}
+    #complete-btn:hover, #restart-btn:hover{background:#f44336}
+    h2{font-size:24px; color:#ff5722; text-align:center; margin:0 0 15px}
+    .done{padding:14px 18px; margin:8px 0; background:#ffccbc; border-left:6px solid #ff5722; border-radius:8px; animation:a .4s}
+    @keyframes a{from{opacity:0; transform:translateY(-20px)}to{opacity:1; transform:none}}
+    #final{text-align:center; font-size:48px; color:#ff5722; font-weight:bold}
 </style>
 </head>
 <body>
 
 <div id="menu"></div>
 
-<div id="right-panel">
-    <button id="main-complete">完成</button>
-    <div id="completed-area">
-        <div id="completed-title">已完成</div>
-        <div id="completed-items"></div>
-    </div>
+<div>
+    <button id="complete-btn">完成</button>
+    <div id="completed-area"><h2>已完成</h2><div id="done-list"></div></div>
 </div>
 
 <script>
-const dishes = [
-    "蜆肉海苔麵豉湯",
-    "腐皮烏冬",
-    "釜玉烏冬",
-    "炸蝦天婦羅烏冬",
-    "豚骨拉麵",
-    "鯛魚湯蜆肉拉麵",
-    "牛肉烏冬"
-];
+const dishes = ["蜆肉海苔麵豉湯","腐皮烏冬","釜玉烏冬","炸蝦天婦羅烏冬","豚骨拉麵","鯛魚湯蜆肉拉麵","牛肉烏冬"];
+let sel = [];
 
-let selectedButtons = [];
-
-function generate12() {
-    const menu = document.getElementById("menu");
-    menu.innerHTML = "";
-    selectedButtons = [];
-
-    for(let i = 0; i < 12; i++) {
-        let dish = dishes[Math.floor(Math.random() * dishes.length)];
-        if (Math.random() < 0.4) dish += "（走蔥）";
-        if (dish.includes("炸蝦天婦羅烏冬") && Math.random() < 0.5) dish += "（另上）";
-
-        const btn = document.createElement("button");
-        btn.className = "food-btn";
-        btn.textContent = (i+1) + ". " + dish;
-
-        btn.onclick = function() {
-            this.classList.toggle("selected");
-            if (this.classList.contains("selected")) {
-                if (!selectedButtons.includes(this)) selectedButtons.push(this);
-            } else {
-                selectedButtons = selectedButtons.filter(b => b !== this);
-            }
+const gen = () => {
+    const m = document.getElementById('menu');
+    m.innerHTML = ''; sel = []; document.getElementById('done-list').innerHTML = '';
+    for(let i=0; i<12; i++){
+        let d = dishes[~~(Math.random()*dishes.length)];
+        if(Math.random()<0.4) d += "（走蔥）";
+        if(d.includes("炸蝦") && Math.random()<0.5) d += "（另上）";
+        const b = document.createElement('button');
+        b.className = 'btn food-btn';
+        b.textContent = (i+1)+". "+d;
+        b.onclick = () => {
+            b.classList.toggle('sel');
+            sel = sel.includes(b) ? sel.filter(x=>x!==b) : [...sel, b];
         };
-        menu.appendChild(btn);
+        m.appendChild(b);
     }
-}
-
-document.getElementById("main-complete").onclick = function() {
-    if (selectedButtons.length === 0) {
-        alert("請至少揀一款食品！");
-        return;
-    }
-
-    const itemsContainer = document.getElementById("completed-items");
-
-    // 將本次選擇的食品插入到最上方（最新完成的放最上）
-    selectedButtons.forEach(btn => {
-        const text = btn.textContent.replace(/^\d+\.\s*/, "");
-        const div = document.createElement("div");
-        div.className = "completed-item";
-        div.textContent = text;
-        itemsContainer.insertBefore(div, itemsContainer.firstChild);  // 關鍵：insertBefore
-    });
-
-    // 左邊按鈕消失
-    selectedButtons.forEach((btn, idx) => {
-        setTimeout(() => {
-            btn.style.opacity = "0";
-            btn.style.transform = "scale(0.8)";
-            setTimeout(() => btn.remove(), 300);
-        }, idx * 80);
-    });
-
-    // 清空選擇 + 檢查是否全部完成
-    setTimeout(() => {
-        selectedButtons = [];
-        const remaining = document.querySelectorAll("#menu .food-btn").length;
-        if (remaining === 0) {
-            showFinalScreen();
-        }
-    }, selectedButtons.length * 80 + 400);
 };
 
-function showFinalScreen() {
-    document.getElementById("menu").innerHTML = `
-        <div id="big-finish">全部完成！</div>
-        <div style="text-align:center;">
-            <button id="restart">重新開始</button>
-        </div>
-    `;
-    document.getElementById("right-panel").style.display = "none";
+document.getElementById('complete-btn').onclick = () => {
+    if(!sel.length) return alert("請至少揀一款食品！");
+    const list = document.getElementById('done-list');
+    sel.forEach(b => {
+        const t = b.textContent.replace(/^\d+\.\s*/, "");
+        const div = document.createElement('div');
+        div.className = 'done';
+        div.textContent = t;
+        list.insertBefore(div, list.firstChild);  // 最新完成的放最上
+        b.style.cssText = 'opacity:0; transform:scale(0.8); transition:.4s';
+        setTimeout(()=>b.remove(), 400);
+    });
+    setTimeout(()=>{
+        sel = [];
+        if(!document.querySelectorAll('.food-btn').length) final();
+    }, sel.length*80 + 500);
+};
 
-    document.getElementById("restart").onclick = () => {
-        document.getElementById("right-panel").style.display = "flex";
-        generate12();
+const final = () => {
+    document.getElementById('menu').innerHTML = `<div id="final">全部完成！</div><button id="restart-btn">重新開始</button>`;
+    document.querySelector('#complete-btn').parentNode.style.display = 'none';
+    document.getElementById('restart-btn').onclick = () => {
+        document.querySelector('#complete-btn').parentNode.style.display = 'block';
+        gen();
     };
-}
+};
 
-// 啟動
-generate12();
+gen();  // 啟動
 </script>
 </body>
 </html>
