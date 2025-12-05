@@ -8,19 +8,22 @@
         font-family:system-ui;
         background:#fff5e6;
         margin:0;
-        height:100dvh;
+        min-height:100dvh;
         display:flex;
+        flex-direction:row;        /* 強制橫向排列 */
         justify-content:center;
         align-items:flex-start;
         gap:20px;
         padding:10px;
         box-sizing:border-box;
-        overflow:auto;
+        overflow-x:auto;           /* 直向時允許左右滑動 */
+        overflow-y:auto;
     }
-    /* 強制左右佈局（即使手機直向都並排，會自動出現橫向捲軸） */
+    /* 絕對禁止變成上下 */
     #menu, #right{
         width:380px;
-        flex-shrink:0;           /* 防止被壓縮 */
+        min-width:380px;
+        flex-shrink:0;             /* 絕不壓縮 */
     }
     #menu, #completed-area{
         background:#fff;
@@ -88,7 +91,7 @@ let sel=[];
 
 const gen=()=>{
     document.getElementById('menu').innerHTML='';
-    document.getElementById('done-list').innerHTML='';  // 永久清空右邊
+    document.getElementById('done-list').innerHTML='';
     sel=[];
     document.getElementById('right').style.display='block';
 
@@ -111,7 +114,7 @@ document.getElementById('complete-btn').onclick=()=>{
         const div=document.createElement('div');
         div.className='done';
         div.textContent=b.textContent.replace(/^\d+\.\s*/,"");
-        list.insertBefore(div,list.firstChild);   // 最新完成的放最上
+        list.insertBefore(div,list.firstChild);
         b.style.cssText='opacity:0;transform:scale(0.8);transition:.4s';
         setTimeout(()=>b.remove(),400);
     });
