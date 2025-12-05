@@ -4,20 +4,70 @@
 <meta charset="UTF-8">
 <title>湯麵區練習</title>
 <style>
-    body{font-family:system-ui;background:#fff5e6;margin:0;height:100dvh;display:grid;place-items:center;gap:30px;padding:15px;box-sizing:border-box}
-    @media (orientation:portrait){body{grid-template-columns:1fr;gap:20px}}
-    @media (orientation:landscape){body{grid-template-columns:1fr 1fr}}
-    #menu,#completed-area{background:#fff;border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.15);min-height:500px;overflow-y:auto}
-    .btn{padding:18px;margin:8px 0;width:100%;border-radius:12px;font-size:20px;text-align:left;cursor:pointer;transition:.2s}
-    .food-btn{background:#fffae6;border:2px solid #ffcc80}
+    body{
+        font-family:system-ui;
+        background:#fff5e6;
+        margin:0;
+        height:100dvh;
+        display:flex;
+        justify-content:center;
+        align-items:flex-start;
+        gap:20px;
+        padding:10px;
+        box-sizing:border-box;
+        overflow:auto;
+    }
+    /* 強制左右佈局（即使手機直向都並排，會自動出現橫向捲軸） */
+    #menu, #right{
+        width:380px;
+        flex-shrink:0;           /* 防止被壓縮 */
+    }
+    #menu, #completed-area{
+        background:#fff;
+        border-radius:20px;
+        padding:20px;
+        box-shadow:0 10px 30px rgba(0,0,0,.15);
+        min-height:520px;
+        overflow-y:auto;
+    }
+    .btn{
+        padding:18px;
+        margin:8px 0;
+        width:100%;
+        border-radius:12px;
+        font-size:20px;
+        text-align:left;
+        cursor:pointer;
+        transition:.2s;
+    }
+    .food-btn{background:#fffae6; border:2px solid #ffcc80}
     .food-btn:hover{background:#fff0b3}
-    .food-btn.sel{background:#ff6d3b;color:#fff;border-color:#f44336}
-    #complete-btn,#restart-btn{padding:18px 50px;font-size:26px;background:#ff5722;color:#fff;border:none;border-radius:16px;cursor:pointer;box-shadow:0 8px 20px rgba(255,87,34,.4)}
+    .food-btn.sel{background:#ff6d3b; color:#fff; border-color:#f44336}
+    #complete-btn,#restart-btn{
+        padding:18px 50px;
+        font-size:26px;
+        background:#ff5722;
+        color:#fff;
+        border:none;
+        border-radius:16px;
+        cursor:pointer;
+        box-shadow:0 8px 20px rgba(255,87,34,.4);
+        margin-bottom:15px;
+        width:100%;
+    }
     #complete-btn:hover,#restart-btn:hover{background:#f44336}
-    h2{font-size:24px;color:#ff5722;text-align:center;margin:0 0 15px}
-    .done{padding:14px 18px;margin:8px 0;background:#ffccbc;border-left:6px solid #ff5722;border-radius:8px;animation:a .4s}
-    @keyframes a{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
-    #final{text-align:center;font-size:48px;color:#ff5722;font-weight:bold}
+    h2{font-size:24px; color:#ff5722; text-align:center; margin:0 0 15px}
+    .done{
+        padding:14px 18px;
+        margin:8px 0;
+        background:#ffccbc;
+        border-left:6px solid #ff5722;
+        border-radius:8px;
+        animation:a .4s;
+    }
+    @keyframes a{from{opacity:0; transform:translateY(-20px)}to{opacity:1; transform:none}}
+    #final{text-align:center; font-size:48px; color:#ff5722; font-weight:bold}
+    #right{text-align:center}
 </style>
 </head>
 <body>
@@ -26,18 +76,21 @@
 
 <div id="right">
     <button id="complete-btn">完成</button>
-    <div id="completed-area"><h2>已完成</h2><div id="done-list"></div></div>
+    <div id="completed-area">
+        <h2>已完成</h2>
+        <div id="done-list"></div>
+    </div>
 </div>
 
 <script>
 const dishes=["蜆肉海苔麵豉湯","腐皮烏冬","釜玉烏冬","炸蝦天婦羅烏冬","豚骨拉麵","鯛魚湯蜆肉拉麵","牛肉烏冬"];
 let sel=[];
 
-const gen=()=>{                              // 完全重置遊戲
+const gen=()=>{
     document.getElementById('menu').innerHTML='';
-    document.getElementById('done-list').innerHTML='';   // 強制清空右邊
+    document.getElementById('done-list').innerHTML='';  // 永久清空右邊
     sel=[];
-    document.getElementById('right').style.display='block'; // 確保右邊面板顯示
+    document.getElementById('right').style.display='block';
 
     for(let i=0;i<12;i++){
         let d=dishes[~~(Math.random()*dishes.length)];
@@ -71,10 +124,10 @@ document.getElementById('complete-btn').onclick=()=>{
 const final=()=>{
     document.getElementById('menu').innerHTML=`<div id="final">全部完成！</div><button id="restart-btn">重新開始</button>`;
     document.getElementById('right').style.display='none';
-    document.getElementById('restart-btn').onclick=gen;   // 直接綁定 gen，保證清空
+    document.getElementById('restart-btn').onclick=gen;
 };
 
-gen();   // 啟動
+gen();
 </script>
 </body>
 </html>
