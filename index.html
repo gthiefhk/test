@@ -10,20 +10,19 @@
         margin:0;
         min-height:100dvh;
         display:flex;
-        flex-direction:row;        /* 強制橫向排列 */
+        flex-direction:row;
         justify-content:center;
         align-items:flex-start;
         gap:20px;
         padding:10px;
         box-sizing:border-box;
-        overflow-x:auto;           /* 直向時允許左右滑動 */
+        overflow-x:auto;
         overflow-y:auto;
     }
-    /* 絕對禁止變成上下 */
     #menu, #right{
         width:380px;
         min-width:380px;
-        flex-shrink:0;             /* 絕不壓縮 */
+        flex-shrink:0;
     }
     #menu, #completed-area{
         background:#fff;
@@ -86,7 +85,7 @@
 </div>
 
 <script>
-const dishes=["蜆肉海苔麵豉湯","腐皮烏冬","釜玉烏冬","炸蝦天婦羅烏冬","豚骨拉麵","鯛魚湯蜆肉拉麵","牛肉烏冬"];
+const dishes=["蜆肉海苔麵豉湯","腐皮烏冬","釜玉烏冬","炸蝦天婦羅烏冬","豚骨拉麵","鯛魚湯蜆肉拉麵","牛肉烏冬","茶碗蒸"];
 let sel=[];
 
 const gen=()=>{
@@ -97,8 +96,13 @@ const gen=()=>{
 
     for(let i=0;i<12;i++){
         let d=dishes[~~(Math.random()*dishes.length)];
-        if(Math.random()<0.4) d+="（走蔥）";
-        if(d.includes("炸蝦")&&Math.random()<0.5) d+="（另上）";
+        
+        // 只有非茶碗蒸的菜式才有機會加（走蔥）
+        if(d !== "茶碗蒸" && Math.random()<0.4) d+="（走蔥）";
+        
+        // 只限炸蝦天婦羅烏冬加（另上）
+        if(d.includes("炸蝦天婦羅烏冬") && Math.random()<0.5) d+="（另上）";
+        
         const b=document.createElement('button');
         b.className='btn food-btn';
         b.textContent=(i+1)+". "+d;
